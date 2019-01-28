@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    <link rel="icon" href="assets/img/favicon/favicon.ico" type="image/png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Audits</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <button type="button" class="btn btn-success">Add</button>
+                            <button type="button" class="btn btn-secondary">Edit</button>
+                            <button type="button" class="btn btn-danger">Delete</button>
+                        </div>
+                        <div class="row">
+                            <table class="table">
+                                <tr>
+                                    <th>Audit</th>
+                                    <th>Date</th> 
+                                </tr>
+                                <tr style="background-color: #FFFF00">
+                                    <td>Report 1</td>
+                                    <td>2019-01-01</td> 
+                                </tr>
+                                <tr>
+                                    <td>Report 2</td>
+                                    <td>2019-01-27</td> 
+                                </tr>
+                            </table>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Rooms</div>
+                    <div class="panel-body">
+                        <div class="row">
+                                <button type="button" class="btn btn-success">Add</button>
+                                <button type="button" class="btn btn-secondary">Edit</button>
+                                <button type="button" class="btn btn-danger">Delete</button>
+                        </div>
+                        <div class="row">
+                            <table class="table">
+                                <tr style="background-color: #FFFF00">
+                                    <td>Report 1</td>
+                                </tr>
+                                <tr>
+                                    <td>Report 2</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Checklist</div>
+                    <div class="panel-body">
+                            <div class="row">
+                                    <button type="button" class="btn btn-secondary">Save</button>
+                            </div>
+                            <div class="row">
+                                <table class="table">
+                                        <tr>
+                                            <td>  
+                                                <input class="form-check-input" type="checkbox" value="" id="c1">
+                                                <label class="form-check-label" for="defaultCheck1">
+                                                        Fire extinguisher (
+                                                            <input class="form-check-input" type="checkbox" value="" id="c1_ns">
+                                                            <label class="form-check-label" for="defaultCheck1">not signed</label>
+                                                            <input class="form-check-input" type="checkbox" value="" id="c1_b">
+                                                            <label class="form-check-label" for="defaultCheck1">blocked</label>
+                                                            <input class="form-check-input" type="checkbox" value="" id="c1_nm">
+                                                            <label class="form-check-label" for="defaultCheck1">not mounted</label>
+                                                            <input class="form-check-input" type="checkbox" value="" id="c1_po">
+                                                            <label class="form-check-label" for="defaultCheck1">pin out</label>
+                                                        )
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>  
+                                                <input class="form-check-input" type="checkbox" value="" id="c2">
+                                                <label class="form-check-label" for="defaultCheck1">
+                                                        Evacuation map (
+                                                            <input class="form-check-input" type="checkbox" value="" id="c2_m">
+                                                            <label class="form-check-label" for="defaultCheck1">missing</label>
+                                                            <input class="form-check-input" type="checkbox" value="" id="c2_nor">
+                                                            <label class="form-check-label" for="defaultCheck1">no evacuation route</label>
+                                                            <input class="form-check-input" type="checkbox" value="" id="c2_b">
+                                                            <label class="form-check-label" for="defaultCheck1">blocked</label>
+                                                        )
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>  
+                                                <input class="form-check-input" type="checkbox" value="" id="c3">
+                                                <label class="form-check-label" for="defaultCheck1">
+                                                        Emergency kit (
+                                                            <input class="form-check-input" type="checkbox" value="" id="c3_nl">
+                                                            <label class="form-check-label" for="defaultCheck1">not located</label>
+                                                            <input class="form-check-input" type="checkbox" value="" id="c3_ns">
+                                                            <label class="form-check-label" for="defaultCheck1">not stocked</label>
+                                                            <input class="form-check-input" type="checkbox" value="" id="c3_ic">
+                                                            <label class="form-check-label" for="defaultCheck1">inside cabinet</label>
+                                                        )
+                                                </label>
+                                            </td>
+                                        </tr>
+                                </table>
+                            </div>
+                        
+                    </div>
+
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Generated Report</div>
+                    <div class="panel-body">
+                        <div class="row">
+                                <button type="button" class="btn btn-secondary">Generate</button>
+                        </div>
+                        <div class="row">
+                                The rooms with blah are blah.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        </div>
+    </div>
+    
+    <!-- JS -->
+    <script type="text/javascript">
+    $(document).ready(function() {
+
+    })
+    </script>
+</body>
+
+</html>

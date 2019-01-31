@@ -17,301 +17,193 @@ module.exports = function (app) {
   // API ROUTES
   //=================================================================================
 
-  // // creates new user
-  // app.post("/api/register", function (req, res) {
+  // GET all target audit or all audits and the single target's room data
+  app.get("/api/audit/:AuditId", function (req, res) {
 
-  //   // create salt and use salt to hash the plain text password
-  //   var salt = bcrypt.genSaltSync(saltRounds);
-  //   var hash = bcrypt.hashSync(req.body.password, salt);
+    let auditTarget = req.params.AuditId;
+    let result = {};
 
-  //   // store new user info + salt + hashed password into db
-  //   db.User.create({
-  //     username: req.body.username,
-  //     email: req.body.email,
-  //     password: hash,
-  //     salt: salt
-  //   }).then(function () {
-  //     res.end("Registration complete!");
-  //   }).catch(function (err) {
-  //     res.json({ error: err.message });
-  //   });
-  // });
+    if (auditTarget == undefined) {
+      db.Audit.findAll()
+      .then(function (auditData) {
 
-  // // after user logs in, compare entered password with db password 
-  // app.post("/api/login", function (req, res) {
-  //   db.User.findOne({ where: { email: req.body.email } }).then(function (data) {
+          if (auditData[0]) {
+            db.Room.findAll({ where: { AuditId: auditData[0].id } })
+            .then(function (roomData) {
+              result.auditData = auditData;
+              result.roomData = roomData;
+              result.success = true;
+              res.json(result);
+            });
+          } else {
+            result.success = true;
+            res.json(result.message = "No results");
+          }
 
-  //     if (!data) {
-  //       res.json({
-  //         success: false,
-  //         message: 'User not found',
-  //         token: null
-  //       });
-  //     } else {
+      }).catch(function (err) {
+        res.json({error: err.message})
+      });;
 
-  //       // hash the inputted password
-  //       var hash = bcrypt.hashSync(req.body.password, data.salt);
+    } else {
 
-  //       // if user is found and password is right
-  //       if (data.password === hash) {
+      db.Audit.findAll({ 
+        where: {id: auditTarget} 
+      }).then(function (auditData) {
 
-  //         // create a token
-  //         var token = jwt.sign({
-  //           "id": data.id,
-  //           "username": data.username,
-  //           "email": data.email
-  //         }, process.env.SECRET_WORD, {
-  //             expiresIn: "24h" // expires in 24 hours
-  //           });
+        if (auditData[0]) {
+          db.Room.findAll({ where: { AuditId: auditData[0].id } })
+          .then(function (roomData) {
+            result.auditData = auditData;
+            result.roomData = roomData;
+            result.success = true;
+            res.json(result);
+          });
+        } else {
+          result.message = "No results";
+          result.success = true;
+          res.json(result);
+        }
 
-  //         // return the information including token as JSON
-  //         res.json({
-  //           success: true,
-  //           message: 'Enjoy your token!',
-  //           token: token
-  //         });
-  //       } else {
-  //         // otherwise, return login failure message
-  //         res.json({
-  //           success: false,
-  //           message: 'Incorrect login info',
-  //           token: null
-  //         });
-  //       }
-  //     }
+      }).catch(function (err) {
+        res.json({error: err.message})
+      });;
+    }
 
-  //   });
-  // });
+  });
 
-  // // GET route for getting all posts where partnerId is null
-  // app.get("/api/post", function (req, res) {
+  // Audits
+  //=====================================================================================
+  
+  // Create Audit
+  app.post("/api/audit/add", function (req, res) {
 
-  //   var token = req.headers.authorization;
-  //   var decodedToken;
+    db.Audit.create({
+      site: req.body.site,
+      date: req.body.date    
+    }).then(function () {
+      res.json({success: true});
+    }).catch(function (err) {
+      res.json({error: err.message})
+    });
 
-  //   if (token) {
-  //     // Checks to see if it's expired
-  //     jwt.verify(token, process.env.SECRET_WORD, function (err, decoded) {
-  //       decodedToken = decoded;
-  //     });
-  //   }
+  });
 
-  //   // find all of the posts and return username and posts
-  //   db.Post.findAll({
-  //     where: {
-  //       partnerId: null
-  //     },
-  //     include: [{
-  //       model: db.User,
-  //       attributes: ["username", "id"]
-  //     }]
-  //   }).then(function (dbPost) {
-  //     var data = {
-  //       posts: dbPost
-  //     };
+  // Edit Audit
+  app.put("/api/audit/edit", function (req, res) {
+    db.Audit.update({
+      site: req.body.site,
+      date: req.body.date 
+    }, {
+        where: {
+          id: req.body.AuditId
+        }
+      }).then(function (data) {
+        data.success = true;
+        res.json(data);
+      }).catch(function (err) {
+        res.json({error: err.message})
+      });;
+  });
 
-  //     if (decodedToken) {
-  //       data.username = decodedToken.username
-  //     } else {
-  //       data.username = null;
-  //     }
+  // Delete Audit
+  app.delete("/api/audit/delete", function (req, res) {
+    db.Audit.destroy({
+      where: { id: req.body.AuditId },
+    }).then(function () {
+      res.json({sucess: true});
+    }).catch(function (err) {
+      res.json({error: err.message})
+    });;
+  });
 
-  //     res.json(data);
-  //   });
-  // });
+  // Rooms
+  //=====================================================================================
 
-  // // Get route for getting a single user's posts that they created
-  // app.get("/api/my-post", function (req, res) {
+  // Create Room
+  app.post("/api/room/add", function (req, res) {
 
-  //   var token = req.headers.authorization;
+    db.Room.create({
+      name: req.body.name,
+      AuditId: req.body.AuditId
+    }).then(function () {
+      res.json({success: true});
+    }).catch(function (err) {
+      res.json({error: err.message})
+    });
 
-  //   // Checks to see if it's expired
-  //   jwt.verify(token, process.env.SECRET_WORD, function (err, decoded) {
-  //     if (err) {
-  //       /*
-  //         err = {
-  //           name: 'TokenExpiredError',
-  //           message: 'jwt expired',
-  //           expiredAt: 1408621000
-  //         }
-  //       */
-  //       console.error(err);
-  //     } else {
+  });
 
-  //       // find all of the posts to this user
-  //       db.Post.findAll({
-  //         where:
-  //         { UserId: decoded.id },
-  //         include: [{
-  //           model: db.User,
-  //           where: {},
-  //           attributes: ["username", "id"]
-  //         }]
-  //       }).then(function (dbPost) {
-  //         var data = {
-  //           username: decoded.username,
-  //           posts: dbPost
-  //         }
-  //         res.json(data);
-  //       });
-  //     };
-  //   });
-  // });
+  // Edit Audit
+  app.put("/api/room/edit", function (req, res) {
+    db.Room.update({
+      name: req.body.name,
+      c1: req.body.c1,
+      c1_ns: req.body.c1_ns,
+      c1_b: req.body.c1_b,
+      c1_nm: req.body.c1_nm,
+      c1_po: req.body.c1_po,
+      c2: req.body.c2,
+      c2_m: req.body.c2_m,
+      c2_nor: req.body.c2_nor,
+      c2_b: req.body.c2_b,
+      c3: req.body.c3,
+      c3_nl: req.body.c3_nl,
+      c3_ns: req.body.c3_ns,
+      c3_ic: req.body.c3_ic,
+      c4: req.body.c4,
+      c4_m: req.body.c4_m,
+      c4_b: req.body.c4_b,
+      c4_o: req.body.c4_o,
+      c5: req.body.c5,
+      c5_50: req.body.c5_50,
+      c5_20: req.body.c5_20,
+      c6: req.body.c6,
+      c6_ct: req.body.c6_ct,
+      c6_l: req.body.c6_l,
+      c6_fc: req.body.c6_fc,
+      c7: req.body.c7,
+      c8: req.body.c8,
+      c9: req.body.c9,
+      c9_u: req.body.c9_u,
+      c9_d: req.body.c9_d,
+      c9_hec: req.body.c9_hec, 
+      c9_dc: req.body.c9_dc,
+      c9_ecup: req.body.c9_ecup,
+      c10: req.body.c10,
+      c10_u: req.body.c10_u,
+      c11: req.body.c11,
+      c11_piaf: req.body.c11_piaf,
+      c11_c: req.body.c11_c,
+      c11_sh: req.body.c11_sh,
+      c12: req.body.c12,
+      c13: req.body.c13,
+      c13_s: req.body.c13_s,
+      c13_c: req.body.c13_c,
+      c13_t: req.body.c13_t,
+      c13_d: req.body.c13_d,
+      c13_v: req.body.c13_v,
+      notes: req.body.notes
+    }, {
+        where: {
+          id: req.body.id
+        }
+      }).then(function (data) {
+        data.success = true;
+        res.json(data);
+      }).catch(function (err) {
+        res.json({error: err.message})
+      });;
+  });
 
-  // // Get route for getting a single user's posts that they accepted
-  // app.get("/api/my-post/accepted", function (req, res) {
-
-  //   var token = req.headers.authorization;
-
-  //   // Checks to see if it's expired
-  //   jwt.verify(token, process.env.SECRET_WORD, function (err, decoded) {
-  //     if (err) {
-  //       /*
-  //         err = {
-  //           name: 'TokenExpiredError',
-  //           message: 'jwt expired',
-  //           expiredAt: 1408621000
-  //         }
-  //       */
-  //       console.error(err);
-  //     } else {
-
-  //       // find all of the posts to this user
-  //       db.Post.findAll({
-  //         where: { partnerId: decoded.id },
-  //         include: [{
-  //           model: db.User,
-  //           attributes: ["username", "id"]
-  //         }]
-  //       }).then(function (dbPost) {
-  //         var data = {
-  //           posts: dbPost
-  //         }
-  //         res.json(data);
-  //       });
-  //     };
-  //   });
-  // });
-
-  // // creates new post
-  // app.post("/api/post", function (req, res) {
-
-  //   var token = req.body.authorization;
-
-  //   // Checks to see if it's expired
-  //   jwt.verify(token, process.env.SECRET_WORD, function (err, decoded) {
-  //     if (err) {
-  //       /*
-  //         err = {
-  //           name: 'TokenExpiredError',
-  //           message: 'jwt expired',
-  //           expiredAt: 1408621000
-  //         }
-  //       */
-  //       res.json({ error: err.message });
-  //     } else {
-  //       // console.log(decoded);
-  //       var userId = decoded.id
-
-  //       db.Post.create({
-  //         UserId: decoded.id,
-  //         title: req.body.title,
-  //         description: req.body.description,
-  //         address: req.body.address,
-  //         category: req.body.category,
-  //         time: req.body.time
-  //       }).then(function () {
-  //         res.end("Added new post!");
-  //       });
-  //     }
-  //   })
-  // });
-
-
-  // // deletes post
-  // app.delete("/api/my-activities/", function (req, res) {
-
-  //   var token = req.body.authorization;
-
-  //   // Checks to see if it's expired
-  //   jwt.verify(token, process.env.SECRET_WORD, function (err, decoded) {
-  //     if (err) {
-  //       /*
-  //         err = {
-  //           name: 'TokenExpiredError',
-  //           message: 'jwt expired',
-  //           expiredAt: 1408621000
-  //         }
-  //       */
-  //       console.error(err);
-  //     } else {
-
-  //       // find all of the posts to this user
-  //       db.Post.destroy({
-  //         where: { id: req.body.activityID },
-  //       }).then(function () {
-  //         res.end("Activity deleted");
-  //       });
-  //     };
-  //   });
-
-  // });
-
-  // // removes User from activity
-  // app.put("/api/post", function (req, res) {
-  //   db.Post.update({
-  //     partnerId: null,
-  //   }, {
-  //       where: {
-  //         id: req.body.activityID
-  //       }
-  //     }).then(function (dbPost) {
-  //       res.json(dbPost);
-  //     });
-  // });
-
-  // // adds User to partnerId of activity
-  // app.put("/api/post/accept", function (req, res) {
-
-  //   var token = req.body.authorization;
-
-  //   // Checks to see if it's expired
-  //   jwt.verify(token, process.env.SECRET_WORD, function (err, decoded) {
-  //     if (err) {
-  //       /*
-  //         err = {
-  //           name: 'TokenExpiredError',
-  //           message: 'jwt expired',
-  //           expiredAt: 1408621000
-  //         }
-  //       */
-  //       console.error(err);
-  //       res.json({ error: err });
-  //     } else {
-
-  //       // check if the user is trying to accept their own post
-  //       // console.log(req.body);
-  //       // console.log(decoded.id, req.body.UserId);
-
-  //       if (decoded.id == req.body.UserId) {
-  //         res.json({ error: "You can't accept your own post!" });
-  //       } else {
-  //         // update post partnerId to user
-  //         db.Post.update(
-  //           {
-  //             partnerId: decoded.id,
-  //             partnerUsername: decoded.username
-  //           },
-  //           {
-  //             where: { id: req.body.activityID }
-  //           }).then(function () {
-  //             res.end("Activity joined!");
-  //           });
-  //       }
-
-
-  //     }; // closes else
-  //   }) //closes jwt.verify
-  // }) // closes app.put
+  // Delete Audit
+  app.delete("/api/room/delete", function (req, res) {
+    db.Room.destroy({
+      where: { id: req.body.id },
+    }).then(function () {
+      res.json({sucess: true});
+    }).catch(function (err) {
+      res.json({error: err.message})
+    });;
+  });
 
 } // close module export function

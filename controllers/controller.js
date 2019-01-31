@@ -23,7 +23,7 @@ module.exports = function (app) {
     let auditTarget = req.params.AuditId;
     let result = {};
 
-    if (auditTarget == undefined) {
+    if (auditTarget == 0) {
       db.Audit.findAll()
       .then(function (auditData) {
 
@@ -118,6 +118,22 @@ module.exports = function (app) {
 
   // Rooms
   //=====================================================================================
+
+  // Get 1 Room
+  app.get("/api/room/:id", function (req, res) {
+
+    db.Room.findOne({
+      where: { id: req.params.id}
+    }).then(function (roomData) {
+      let data = {};
+      data.roomData = roomData;
+      data.success = true;
+      res.json(data);
+    }).catch(function (err) {
+      res.json({error: err.message})
+    });
+
+  });
 
   // Create Room
   app.post("/api/room/add", function (req, res) {

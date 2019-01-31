@@ -25,16 +25,16 @@
                             <button type="button" class="btn btn-danger">Delete</button>
                         </div>
                         <div class="row">
-                            <table class="table">
+                            <table class="table" id="audit_table">
                                 <tr>
                                     <th>Audit</th>
                                     <th>Date</th> 
                                 </tr>
-                                <tr style="background-color: #FFFF00">
+                                <tr style="background-color: #FFFF00" class="audit_item">
                                     <td>Report 1</td>
                                     <td>2019-01-01</td> 
                                 </tr>
-                                <tr>
+                                <tr class = "audit_item">
                                     <td>Report 2</td>
                                     <td>2019-01-27</td> 
                                 </tr>
@@ -54,12 +54,12 @@
                                 <button type="button" class="btn btn-danger">Delete</button>
                         </div>
                         <div class="row">
-                            <table class="table">
+                            <table class="table" id="room_table">
                                 <tr style="background-color: #FFFF00">
-                                    <td>Report 1</td>
+                                    <td>Room 1</td>
                                 </tr>
                                 <tr>
-                                    <td>Report 2</td>
+                                    <td>Room 2</td>
                                 </tr>
                             </table>
                         </div>
@@ -250,6 +250,14 @@
                                                 </label>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="form-group">
+                                                    <label for="notes">Notes:</label>
+                                                    <textarea class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3" id="notes"></textarea>
+                                                </div>
+                                            </td>
+                                        </tr>
                                         
                                 </table>
                             </div>
@@ -276,7 +284,87 @@
     
     <!-- JS -->
     <script type="text/javascript">
+
     $(document).ready(function() {
+        
+        var state = {};
+
+        function clearHighlights () {
+            $("tr").attr("style", "");
+        }
+
+        function getFormattedDate(date) {
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        let getInitialDataSetInitialState = function(AuditId = undefined) {
+            $.ajax({
+            url: "/api/audit/0",
+            type: 'GET',
+            success: 
+                function(data) {
+
+                    console.log(state);
+                    let promise = new Promise(function(resolve, reject) {
+                        state.AuditId = AuditId ? AuditId : data.auditData[0].id;
+                        state.RoomId = data.roomData[0].id;
+                        state.Data = data;
+                        renderGivenState(data);
+                    });
+                    promise.then(
+                        console.log(state),
+                        $("#a" + state.AuditId).attr("style", "background-color: #FFFF00")
+                    );
+                    
+                }
+            });
+        }
+        
+        let renderGivenState = function(data) {
+            //Audit Items
+            $("#audit_table").empty();
+            $("#room_table").empty();
+
+            let newTR_header = $("<tr>");
+            let newTD_header_site = $("<th>").html("Site").appendTo(newTR_header);
+            let newTD_header_date = $("<th>").html("Date").appendTo(newTR_header);
+            newTR_header.appendTo($("#audit_table"));
+
+            for (let i = 0; i < data.auditData.length; i++) {
+                let newTR = $("<tr>");
+                let newTD_site = $("<td>");
+                let newTD_date = $("<td>");
+
+                let date = new Date(data.auditData[i].date).toString();
+
+                newTR.attr("data-AuditId", "a" + data.auditData[i].id);
+                newTR.addClass("audit_item");
+
+                newTD_site.html(data.auditData[i].site);
+                newTD_date.html(date.substr(0,15));
+                newTR.append(newTD_site).append(newTD_date);
+                newTR.appendTo($("#audit_table"));
+            }
+
+            for (let i = 0; i < data.roomData.length; i++) {
+                let newTR = $("<tr>");
+                let newTD_room = $("<td>");
+
+                newTR.attr("data-RoomId", "r" + data.roomData[i].id);
+                newTR.addClass("room_item");
+
+                newTD_room.html(data.roomData[i].name);
+                newTR.append(newTD_room);
+                newTR.appendTo($("#room_table"));
+            }
+        }
+
+        getInitialDataSetInitialState();
 
     })
     </script>

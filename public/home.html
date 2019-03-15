@@ -281,6 +281,50 @@
         </div>
         </div>
     </div>
+
+    <!-- BEGIN DETAILS MODAL -->
+    <div id="modalAudit" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="detail-title">Audit</h4>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Category:</strong>
+                        <div id="modalAuditName">Name Here</div>
+                    </p>
+                    <p><strong>Category:</strong>
+                        <div id="modalAuditDate">Date Here</div>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-round btn-fill" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success btn-round btn-fill" id="acceptBtn">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modalRoom" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="detail-title">Room</h4>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Category:</strong>
+                        <div id="modalRoomName">Name Here</div>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-round btn-fill" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success btn-round btn-fill" id="acceptBtn">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END DETAILS MODAL -->
     
     <!-- JS -->
     <script type="text/javascript">
@@ -288,10 +332,6 @@
     $(document).ready(function() {
         
         var state = {};
-
-        function clearHighlights () {
-            $("tr").attr("style", "");
-        }
 
         function getFormattedDate(date) {
             var year = date.getFullYear();
@@ -327,8 +367,7 @@
         
         let renderGivenState = function(data) {
             //Audit Items
-            $("#audit_table").empty();
-            $("#room_table").empty();
+            clearAuditsAndRooms();
 
             let newTR_header = $("<tr>");
             let newTD_header_site = $("<th>").html("Site").appendTo(newTR_header);
@@ -362,6 +401,143 @@
                 newTR.append(newTD_room);
                 newTR.appendTo($("#room_table"));
             }
+        }
+
+        let getValuesFromForm = function() {
+            payload = {};
+        
+            payload.c1 = $('#c1').is(":checked");
+            payload.c1_ns = $('#c1_ns').is(":checked");
+            payload.c1_b = $('#c1_b').is(":checked");
+            payload.c1_nm = $('#c1_nm').is(":checked");
+            payload.c1_po = $('#c1_po').is(":checked");
+
+            payload.c2 = $('#c2').is(":checked");
+            payload.c2_m = $('#c2_m').is(":checked");
+            payload.c2_nor = $('#c2_nor').is(":checked");
+            payload.c2_b = $('#c2_b').is(":checked");
+
+            payload.c3 = $('#c3').is(":checked");
+            payload.c3_nl = $('#c3_nl').is(":checked");
+            payload.c3_ns = $('#c3_ns').is(":checked");
+            payload.c3_ic = $('#c3_ic').is(":checked");
+            
+            payload.c4 = $('#c4').is(":checked");
+            payload.c4_m = $('#c4_m').is(":checked");
+            payload.c4_b = $('#c4_b').is(":checked");
+            payload.c4_o = $('#c4_o').is(":checked");
+
+            payload.c5 = $('#c5').is(":checked");
+            payload.c5_50 = $('#c5_50').is(":checked");
+            payload.c5_20 = $('#c5_20').is(":checked");
+
+            payload.c6 = $('#c6').is(":checked");
+            payload.c6_ct = $('#c6_ct').is(":checked");
+            payload.c6_l = $('#c6_l').is(":checked");
+            payload.c6_fc = $('#c6_fc').is(":checked");
+
+            payload.c7 = $('#c7').is(":checked");
+
+            payload.c8 = $('#c8').is(":checked");
+
+            payload.c9 = $('#c9').is(":checked");
+            payload.c9_u = $('#c9_u').is(":checked");
+            payload.c9_d = $('#c9_d').is(":checked");
+            payload.c9_hec = $('#c9_hec').is(":checked");
+            payload.c9_dc = $('#c9_dc').is(":checked");
+            payload.c9_ecup = $('#c9_ecup').is(":checked");
+
+            payload.c10 = $('#c10').is(":checked");
+            payload.c10_u = $('#c10_u').is(":checked");
+
+            payload.c11 = $('#c11').is(":checked");
+            payload.c11_piaf = $('#c11_piaf').is(":checked");
+            payload.c11_c = $('#c11_c').is(":checked");
+            payload.c11_sh = $('#c11_sh').is(":checked");
+
+            payload.c12 = $('#c12').is(":checked");
+
+            payload.c13 = $('#c13').is(":checked");
+            payload.c13_s = $('#c13_s').is(":checked");
+            payload.c13_c = $('#c13_c').is(":checked");
+            payload.c13_t = $('#c13_t').is(":checked");
+            payload.c13_d = $('#c13_d').is(":checked");
+            payload.c13_v = $('#c13_v').is(":checked");
+
+            payload.notes = $('#notes').val();
+
+            return payload
+        }
+
+        let clearHighlights = function () {
+            $("tr").attr("style", "");
+        }
+
+        let clearAuditsAndRooms = function() {
+            $("#audit_table").empty();
+            $("#room_table").empty();
+        }
+
+        let clearOutForm = function() {
+            $('#c1').attr('checked',false);
+            $('#c1_ns').attr('checked',false);
+            $('#c1_b').attr('checked',false);
+            $('#c1_nm').attr('checked',false);
+            $('#c1_po').attr('checked',false);
+
+            $('#c2').attr('checked',false);
+            $('#c2_m').attr('checked',false);
+            $('#c2_nor').attr('checked',false);
+            $('#c2_b').attr('checked',false);
+
+            $('#c3').attr('checked',false);
+            $('#c3_nl').attr('checked',false);
+            $('#c3_ns').attr('checked',false);
+            $('#c3_ic').attr('checked',false);
+            
+            $('#c4').attr('checked',false);
+            $('#c4_m').attr('checked',false);
+            $('#c4_b').attr('checked',false);
+            $('#c4_o').attr('checked',false);
+
+            $('#c5').attr('checked',false);
+            $('#c5_50').attr('checked',false);
+            $('#c5_20').attr('checked',false);
+
+            $('#c6').attr('checked',false);
+            $('#c6_ct').attr('checked',false);
+            $('#c6_l').attr('checked',false);
+            $('#c6_fc').attr('checked',false);
+
+            $('#c7').attr('checked',false);
+
+            $('#c8').attr('checked',false);
+
+            $('#c9').attr('checked',false);
+            $('#c9_u').attr('checked',false);
+            $('#c9_d').attr('checked',false);
+            $('#c9_hec').attr('checked',false);
+            $('#c9_dc').attr('checked',false);
+            $('#c9_ecup').attr('checked',false);
+
+            $('#c10').attr('checked',false);
+            $('#c10_u').attr('checked',false);
+
+            $('#c11').attr('checked',false);
+            $('#c11_piaf').attr('checked',false);
+            $('#c11_c').attr('checked',false);
+            $('#c11_sh').attr('checked',false);
+
+            $('#c12').attr('checked',false);
+
+            $('#c13').attr('checked',false);
+            $('#c13_s').attr('checked',false);
+            $('#c13_c').attr('checked',false);
+            $('#c13_t').attr('checked',false);
+            $('#c13_d').attr('checked',false);
+            $('#c13_v').attr('checked',false);
+
+            $('#notes').val('');
         }
 
         getInitialDataSetInitialState();
